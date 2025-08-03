@@ -3,58 +3,84 @@
 ## Project Structure
 ```
 task-management-system/
-├── main.py                 # FastAPI backend
-├── index.html             # Frontend interface
-├── requirements.txt       # Python dependencies
-├── tasks.db              # SQLite database (auto-created)
-└── README.md             # This file
+├── main.py                # Entry point to start the FastAPI app
+├── init_db.py             # Script to initialize the database (run once)
+├── fronted/               # Frontend interface (HTML, CSS, JS)
+│   ├── index.html         # Main user interface
+│   └── static/
+│       ├── css/
+│       │   └── styles.css # Styling for the UI
+│       └── js/
+│           └── app.js     # JavaScript to handle frontend logic and API calls
+├── app/                   # Backend application package
+│   ├── routers/           # API route handlers
+│   │   ├── tasks.py       # Routes for task CRUD operations
+│   │   ├── categories.py  # Routes to manage task categories
+│   │   └── analysis.py    # Routes for analytics and statistics
+│   ├── models.py          # SQLAlchemy models for DB tables
+│   ├── schemas.py         # Pydantic schemas for request/response validation
+│   ├── database.py        # Database connection and session setup
+│   └── __init__.py        # Marks `app` as a Python package
+├── tasks.db               # SQLite database file (auto-created)
+├── requirements.txt       # Python dependencies list
+└── README.md              # Project documentation
 ```
+---
+## 🚀 Features
+-  **Create, update, delete tasks**
+-  **Track task completion with timestamps**
+-  **Filter tasks by status, priority, or category**
+-  **Simple HTML + JS dashboard**
+
+---
+
+## 🛠️ Tech Stack
+- **Backend:** FastAPI, SQLAlchemy, PostgreSQL
+- **Frontend:** Vanilla JS + HTML + CSS
+- **Database:** PostgreSQL
+- **ORM:** SQLAlchemy (sync)
+- **Dev Tools:** Uvicorn, Alembic (optional)
+
+---
 
 ## Requirements (requirements.txt)
 ```
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-sqlalchemy==2.0.23
-pydantic==2.5.0
-python-multipart==0.0.6
+SQLAlchemy~=2.0.42
+pydantic~=2.11.7
+python-dotenv~=1.1.1
+asyncpg~=0.30.0
+fastapi~=0.116.1
 ```
+---
 
 ## Installation & Setup
 
-### 1. Create Virtual Environment
+### 1. Clone the repo
 ```bash
-# Create virtual environment
-python -m venv task_env
-
-# Activate virtual environment
-# On Windows:
-task_env\Scripts\activate
-# On macOS/Linux:
-source task_env/bin/activate
+git clone https://github.com/your-username/task-manager-dashboard.git
+cd task-manager-dashboard
 ```
 
-### 2. Install Dependencies
+### 2. Set up the virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3. Run the Application
+### 4. Set up the PostgreSQL database
 ```bash
-# Start the FastAPI server
-python main.py
-
-# The server will start on http://localhost:8000
+CREATE DATABASE tasks_db;
 ```
 
-### 4. Access the Application
-- Open your web browser
-- Navigate to the `index.html` file directly, or
-- Serve it through a simple HTTP server:
+### 5. Run the Application
 ```bash
-# Using Python's built-in server
-python -m http.server 3000
-
-# Then open http://localhost:3000 in your browser
+uvicorn app.main:app --reload
 ```
 
 ## API Endpoints
@@ -62,7 +88,7 @@ python -m http.server 3000
 ### Tasks
 - `GET /tasks/` - Get all tasks (with optional filters)
 - `POST /tasks/` - Create a new task
-- `GET /tasks/{task_id}` - Get a specific task
+- `GET /tasks/{task_id}` - Get a specific task by ID
 - `PUT /tasks/{task_id}` - Update a task
 - `DELETE /tasks/{task_id}` - Delete a task
 
@@ -75,214 +101,43 @@ python -m http.server 3000
 - `priority`: Filter by priority (low, medium, high)
 - `category`: Filter by category name
 
-## Features Implemented
 
-### ✅ Task Management
-- Create, read, update, delete tasks
-- Task priorities (Low, Medium, High)
-- Task statuses (To Do, In Progress, Completed)
-- Task categories
-- Time tracking (estimated vs actual hours)
-- Task descriptions
+## Advanced Features To  Add
 
-### ✅ Filtering & Search
-- Filter by status, priority, and category
-- Real-time filtering
-- Dynamic category loading
+- 1. Authentication & User Management
+- 2. Task Dependencies
+- 3. File Attachments
+- 4. Real-time Updates with WebSocket
+- 5. Export Functionality
+- 6. Advanced Analytics
+  - Productivity trends over time
+  - Time estimation accuracy
+  - Task completion patterns
+  - Category performance metrics
+  - Burndown charts
 
-### ✅ Analytics Dashboard
-- Total tasks overview
-- Completion rate calculation
-- Average completion time
-- Tasks breakdown by category
-- Tasks breakdown by priority
-- Daily completion trends (last 7 days)
+---
+## SCreenShots
+Start by adding a new task:
+![img.png](img.png)
 
-### ✅ User Interface
-- Modern, responsive design
-- Tabbed interface (Tasks, Create, Analytics)
-- Modal dialogs for editing
-- Real-time updates
-- Success/error messaging
-- Mobile-friendly layout
+Then you can view your tasks in the “Tasks” list:
+![img_1.png](img_1.png)
 
-### ✅ Database
-- SQLite database with SQLAlchemy ORM
-- Automatic table creation
-- Data persistence
-- Proper relationships and constraints
+You can also update any task fields:
+![img_2.png](img_2.png)
 
-## API Testing
+If you mark a task as In Progress, the start time will automatically be set to the current time.
+If you mark a task as Completed, the completed_at field will automatically display the time of completion:
+![img_3.png](img_3.png)
 
-You can test the API using curl or any API testing tool:
+You can also track your progress in the “Analysis” section:
+![img_4.png](img_4.png)
 
-```bash
-# Create a new task
-curl -X POST "http://localhost:8000/tasks/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "title": "Learn FastAPI",
-    "description": "Study FastAPI documentation",
-    "priority": "high",
-    "category": "Learning",
-    "estimated_hours": 4
-  }'
+---
 
-# Get all tasks
-curl "http://localhost:8000/tasks/"
+## 👤 Author
 
-# Get analytics
-curl "http://localhost:8000/analytics/"
-```
+Bothaina Karakrah – [LinkedIn](https://www.linkedin.com/in/bothaina-karakrah-57458219a/)
 
-## Advanced Features You Can Add
-
-### 1. Authentication & User Management
-```python
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from passlib.context import CryptContext
-import jwt
-
-# Add user authentication
-# Multiple users with separate task lists
-```
-
-### 2. Task Dependencies
-```python
-# Add task relationships
-class TaskDependency(Base):
-    __tablename__ = "task_dependencies"
-    
-    id = Column(Integer, primary_key=True)
-    parent_task_id = Column(Integer, ForeignKey("tasks.id"))
-    child_task_id = Column(Integer, ForeignKey("tasks.id"))
-```
-
-### 3. File Attachments
-```python
-from fastapi import UploadFile, File
-
-@app.post("/tasks/{task_id}/attachments/")
-async def upload_attachment(task_id: int, file: UploadFile = File(...)):
-    # Handle file uploads
-    pass
-```
-
-### 4. Real-time Updates with WebSocket
-```python
-from fastapi import WebSocket
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    # Real-time task updates
-    pass
-```
-
-### 5. Export Functionality
-```python
-import pandas as pd
-from fastapi.responses import StreamingResponse
-
-@app.get("/export/tasks/")
-def export_tasks():
-    # Export tasks to CSV/Excel
-    pass
-```
-
-### 6. Advanced Analytics
-- Productivity trends over time
-- Time estimation accuracy
-- Task completion patterns
-- Category performance metrics
-- Burndown charts
-
-## Database Schema
-
-```sql
-CREATE TABLE tasks (
-    id INTEGER PRIMARY KEY,
-    title VARCHAR NOT NULL,
-    description TEXT,
-    status VARCHAR DEFAULT 'todo',
-    priority VARCHAR DEFAULT 'medium',
-    category VARCHAR,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    completed_at DATETIME,
-    estimated_hours INTEGER DEFAULT 1,
-    actual_hours INTEGER
-);
-```
-
-## Testing
-
-### Unit Tests Example
-```python
-import pytest
-from fastapi.testclient import TestClient
-from main import app
-
-client = TestClient(app)
-
-def test_create_task():
-    response = client.post("/tasks/", json={
-        "title": "Test Task",
-        "priority": "high"
-    })
-    assert response.status_code == 200
-    assert response.json()["title"] == "Test Task"
-
-def test_get_tasks():
-    response = client.get("/tasks/")
-    assert response.status_code == 200
-    assert isinstance(response.json(), list)
-```
-
-## Deployment Options
-
-### 1. Local Development
-```bash
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
-
-### 2. Production with Gunicorn
-```bash
-pip install gunicorn
-gunicorn main:app -w 4 -k uvicorn.workers.UvicornWorker
-```
-
-### 3. Docker Deployment
-```dockerfile
-FROM python:3.9-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-COPY . .
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-```
-
-### 4. Cloud Deployment
-- **Heroku**: Add `Procfile` with `web: uvicorn main:app --host 0.0.0.0 --port $PORT`
-- **Railway**: Direct deployment from GitHub
-- **AWS EC2**: Using Docker or direct installation
-- **Google Cloud Run**: Container deployment
-
-## Troubleshooting
-
-### Common Issues
-
-1. **CORS Errors**: Make sure the frontend is served from the same domain or CORS is properly configured
-2. **Database Not Found**: The SQLite database is created automatically on first run
-3. **Port Already in Use**: Change the port in `uvicorn.run()` or kill the existing process
-4. **Import Errors**: Ensure all dependencies are installed in the virtual environment
-
-### Development Tips
-
-1. **Auto-reload**: Use `--reload` flag during development
-2. **API Documentation**: Visit `http://localhost:8000/docs` for interactive API docs
-3. **Database Inspection**: Use SQLite browser tools to inspect the database
-4. **Logging**: Add logging for debugging: `import logging; logging.basicConfig(level=logging.INFO)`
-
-This project demonstrates a complete full-stack application with modern web technologies, proper database design, and professional development practices!
+License: MIT

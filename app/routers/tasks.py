@@ -50,6 +50,8 @@ async def get_task(task_id: int, db: Session = Depends(get_db)):
     return task
 
 
+from datetime import datetime, timezone
+
 @router.put("/{task_id}", response_model=TaskResponse)
 async def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
     """Update a specific task"""
@@ -58,10 +60,16 @@ async def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depen
         raise HTTPException(status_code=404, detail="Task not found")
 
     update_data = task_update.model_dump(exclude_unset=True)
+
     for field, value in update_data.items():
         setattr(task, field, value)
 
-    if task_update.status == 'Completed' and not task.completed_at:
+    # Auto-set started_at if status changed to "in_progress"
+    if task_update.status and task_update.status.lower() == "in_progress" and not task.started_at:
+        task.started_at = datetime.now(timezone.utc)
+
+    # Auto-set completed_at if status changed to "completed"
+    if task_update.status and task_update.status.lower() == "completed" and not task.completed_at:
         task.completed_at = datetime.now(timezone.utc)
 
     db.commit()
