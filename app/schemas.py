@@ -1,78 +1,50 @@
-# app/schemas.py
-from typing import Optional
-from pydantic import BaseModel, EmailStr, constr, validator
+from typing import Optional, List, Dict
+from pydantic import BaseModel, constr
 from datetime import datetime
-from enum import Enum
+from app.models import TaskStatus, TaskPriority
 
-# ========== User ==========
-class UserBase(BaseModel):
-    username: constr(min_length=3, max_length=50)
-    email: EmailStr
-
-class UserCreate(UserBase):
-    pass
-
-class User(UserBase):
-    id: int
-
-    model_config = {
-        "from_attributes": True
-    }
-
-# ========== Category ==========
-class CategoryBase(BaseModel):
-    name: str
-
-class CategoryCreate(CategoryBase):
-    pass
-
-class Category(CategoryBase):
-    id: int
-
-    model_config = {
-        "from_attributes": True
-    }
-
-# ========== Task ==========
-class TaskStatus(str, Enum):
-    pending = "pending"
-    in_progress = "in_progress"
-    completed = "completed"
-
+# ========== Task Model ==========
 class TaskBase(BaseModel):
     title: constr(min_length=1, max_length=100)
     description: Optional[str] = None
-    priority: int
-    status: TaskStatus = TaskStatus.pending
-    started_at: datetime
-    due_date: datetime
-    completed_at: Optional[datetime] = None
-    time_spent_minutes: Optional[int] = 0
-    category: Optional[str] = None
+    priority: TaskPriority = TaskPriority.MEDIUM
+    category: Optional[str] = "General"
+    estimated_hours: int = 1
 
-    @validator('due_date')
-    def check_due_date(cls, v):
-        if v and v < datetime.utcnow():
-            raise ValueError("due_date cannot be in the past")
-        return v
-
-class TaskCreate(TaskBase):
-    user_id: int
-
-class TaskUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    priority: Optional[int] = None
-    status: Optional[str] = None
+    status: TaskStatus = TaskStatus.TODO
+    created_at: datetime
+    started_at: Optional[datetime] = None
     due_date: Optional[datetime] = None
     completed_at: Optional[datetime] = None
-    time_spent_minutes: Optional[int] = None
+    actual_hours: Optional[int] = 0
+
+class TaskUpdate(BaseModel):
+    title: Optional[constr(min_length=1, max_length=100)] = None
+    description: Optional[str] = None
+    priority: Optional[TaskPriority] = None
+    status: Optional[TaskStatus] = None
+    due_date: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    actual_hours: Optional[int] = None
     category: Optional[str] = None
 
-class Task(TaskBase):
+class TaskCreate(TaskBase):
+    pass
+
+class TaskResponse(TaskBase):
     id: int
-    user_id: int
 
     model_config = {
         "from_attributes": True
     }
+
+# ========== Analytics Model ==========
+class AnalyticsResponse(BaseModel):
+    total_tasks: int
+    completed_tasks: int
+    in_progress_tasks: int
+    completion_rate: float
+    avg_completion_time: float
+    tasks_by_category: Dict[str, int]
+    tasks_by_priority: Dict[str, int]
+    daily_completions: List[Dict[str, int]]

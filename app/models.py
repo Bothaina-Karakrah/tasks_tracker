@@ -1,44 +1,44 @@
-from datetime import datetime
-from sqlalchemy import String, ForeignKey, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from datetime import datetime, timezone
+from sqlalchemy import String, Text, Integer
+from sqlalchemy.orm import Mapped, mapped_column
 from app.database import Base
+from enum import Enum
+from sqlalchemy import Enum as SqlEnum
 
+# ========== Enums ==========
+class TaskStatus(str, Enum):
+    TODO = "todo"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
 
-# ========== User Model ==========
-class User(Base):
-    __tablename__ = "users"
-
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(50), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
-    tasks: Mapped[list["Task"]] = relationship(back_populates="user")
-
-
-# ========== Category Model ==========
-class Category(Base):
-    __tablename__ = "categories"
-
-    id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    name: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
-    tasks: Mapped[list["Task"]] = relationship(back_populates="category")
-
+class TaskPriority(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 # ========== Task Model ==========
 class Task(Base):
     __tablename__ = "tasks"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"), nullable=False)
-
     title: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(Text)
-    priority: Mapped[int] = mapped_column(default=1, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default="todo", nullable=False)
-    started_at: Mapped[datetime] = mapped_column(nullable=False)
-    due_date: Mapped[datetime] = mapped_column(nullable=False)
-    completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
-    time_spent_minutes: Mapped[int] = mapped_column(default=0)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    user: Mapped["User"] = relationship(back_populates="tasks")
-    category: Mapped["Category"] = relationship(back_populates="tasks")
+    priority: Mapped[TaskPriority] = mapped_column(
+        SqlEnum(TaskPriority, name="task_priority"), default=TaskPriority.MEDIUM, nullable=False
+    )
+    status: Mapped[TaskStatus] = mapped_column(
+        SqlEnum(TaskStatus, name="task_status"), default=TaskStatus.TODO, nullable=False
+    )
+
+    category: Mapped[str] = mapped_column(String(100), default="General", nullable=False, index=True)
+
+    estimated_hours: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    actual_hours: Mapped[int | None] = mapped_column(Integer, default=0, nullable=True)
+
+    started_at: Mapped[datetime | None] = mapped_column(nullable=True)
+    due_date: Mapped[datetime | None] = mapped_column(nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(nullable=True)
+
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.now, onupdate=datetime.now, nullable=False)

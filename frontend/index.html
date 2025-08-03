@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="static/css/styles.css" />
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-tasks"></i> Task Management System</h1>
+            <p>Manage your tasks efficiently with productivity analytics</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('tasks')">
+                <i class="fas fa-list"></i> Tasks
+            </button>
+            <button class="nav-tab" onclick="showTab('create')">
+                <i class="fas fa-plus"></i> Create Task
+            </button>
+            <button class="nav-tab" onclick="showTab('analytics')">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </button>
+        </div>
+
+        <!-- Tasks Tab -->
+        <div id="tasks" class="tab-content active">
+            <div class="success-message" id="taskSuccess"></div>
+            <div class="error-message" id="taskError"></div>
+
+            <div class="filters">
+                <select id="statusFilter" onchange="filterTasks()">
+                    <option value="">All Status</option>
+                    <option value="todo">To Do</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+                <select id="priorityFilter" onchange="filterTasks()">
+                    <option value="">All Priorities</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+                <select id="categoryFilter" onchange="filterTasks()">
+                    <option value="">All Categories</option>
+                </select>
+                <button class="btn" onclick="loadTasks()">
+                    <i class="fas fa-refresh"></i> Refresh
+                </button>
+            </div>
+
+            <div id="tasksContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading tasks...
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Task Tab -->
+        <div id="create" class="tab-content">
+            <h2><i class="fas fa-plus-circle"></i> Create New Task</h2>
+            <div class="success-message" id="createSuccess"></div>
+            <div class="error-message" id="createError"></div>
+
+            <form id="createTaskForm">
+                <div class="form-group">
+                    <label for="title">Task Title *</label>
+                    <input type="text" id="title" name="title" required />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="category">Category</label>
+                    <input
+                        type="text"
+                        id="category"
+                        name="category"
+                        placeholder="e.g., Work, Personal, Study"
+                    />
+                </div>
+                <div class="form-group">
+                    <label for="estimated_hours">Estimated Hours</label>
+                    <input type="number" id="estimated_hours" name="estimated_hours" min="1" value="1" />
+                </div>
+                <div class="form-group">
+                    <label for="due_date">Due Date</label>
+                    <input type="datetime-local" id="due_date" name="due_date" />
+                </div>
+                <div class="form-group">
+                    <label for="started_at">Started At</label>
+                    <input type="datetime-local" id="started_at" name="started_at" />
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-plus"></i> Create Task
+                </button>
+            </form>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <h2><i class="fas fa-chart-line"></i> Productivity Analytics</h2>
+            <div id="analyticsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading analytics...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Task Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2><i class="fas fa-edit"></i> Edit Task</h2>
+            <form id="editTaskForm">
+                <input type="hidden" id="editTaskId" />
+                <div class="form-group">
+                    <label for="editTitle">Task Title *</label>
+                    <input type="text" id="editTitle" name="title" required />
+                </div>
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+                    <textarea id="editDescription" name="description" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editStatus">Status</label>
+                    <select id="editStatus" name="status">
+                        <option value="todo">To Do</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editPriority">Priority</label>
+                    <select id="editPriority" name="priority">
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category</label>
+                    <input type="text" id="editCategory" name="category" />
+                </div>
+                <div class="form-group">
+                    <label for="editActualHours">Actual Hours</label>
+                    <input type="number" id="editActualHours" name="actual_hours" min="0" step="0.5" />
+                </div>
+                <div class="form-group">
+                    <label for="editDueDate">Due Date</label>
+                    <input type="datetime-local" id="editDueDate" name="due_date" />
+                </div>
+                <div class="form-group">
+                    <label for="editStartedAt">Started At</label>
+                    <input type="datetime-local" id="editStartedAt" name="started_at" />
+                </div>
+                <div class="form-group">
+                    <label for="editCompletedAt">Completed At</label>
+                    <input type="datetime-local" id="editCompletedAt" name="completed_at" />
+                </div>
+                <button type="submit" class="btn">
+                    <i class="fas fa-save"></i> Update Task
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="static/js/app.js"></script>
+</body>
+</html>
