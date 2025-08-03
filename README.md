@@ -101,21 +101,6 @@ uvicorn app.main:app --reload
 - `priority`: Filter by priority (low, medium, high)
 - `category`: Filter by category name
 
-
-## Advanced Features To  Add
-
-- 1. Authentication & User Management
-- 2. Task Dependencies
-- 3. File Attachments
-- 4. Real-time Updates with WebSocket
-- 5. Export Functionality
-- 6. Advanced Analytics
-  - Productivity trends over time
-  - Time estimation accuracy
-  - Task completion patterns
-  - Category performance metrics
-  - Burndown charts
-
 ---
 ## SCreenShots
 Start by adding a new task:
