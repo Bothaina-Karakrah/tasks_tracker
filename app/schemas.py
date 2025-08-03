@@ -9,14 +9,14 @@ class TaskBase(BaseModel):
     description: Optional[str] = None
     priority: TaskPriority = TaskPriority.MEDIUM
     category: Optional[str] = "General"
-    estimated_hours: int = 1
+    estimated_days: int = 1
 
     status: TaskStatus = TaskStatus.TODO
-    created_at: datetime
+    created_at: Optional[datetime] = None
     started_at: Optional[datetime] = None
     due_date: Optional[datetime] = None
     completed_at: Optional[datetime] = None
-    actual_hours: Optional[int] = 0
+    actual_days: Optional[int] = 0
 
 class TaskUpdate(BaseModel):
     title: Optional[constr(min_length=1, max_length=100)] = None
@@ -25,7 +25,7 @@ class TaskUpdate(BaseModel):
     status: Optional[TaskStatus] = None
     due_date: Optional[datetime] = None
     completed_at: Optional[datetime] = None
-    actual_hours: Optional[int] = None
+    actual_days: Optional[int] = None
     category: Optional[str] = None
 
 class TaskCreate(TaskBase):

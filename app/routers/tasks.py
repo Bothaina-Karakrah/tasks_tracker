@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
@@ -62,7 +62,7 @@ async def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depen
         setattr(task, field, value)
 
     if task_update.status == 'Completed' and not task.completed_at:
-        task.completed_at = datetime.now()
+        task.completed_at = datetime.now(timezone.utc)
 
     db.commit()
     db.refresh(task)

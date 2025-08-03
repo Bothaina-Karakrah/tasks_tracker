@@ -33,8 +33,8 @@ class Task(Base):
 
     category: Mapped[str] = mapped_column(String(100), default="General", nullable=False, index=True)
 
-    estimated_hours: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    actual_hours: Mapped[int | None] = mapped_column(Integer, default=0, nullable=True)
+    estimated_days: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    actual_days: Mapped[int | None] = mapped_column(Integer, default=0, nullable=True)
 
     started_at: Mapped[datetime | None] = mapped_column(nullable=True)
     due_date: Mapped[datetime | None] = mapped_column(nullable=True)

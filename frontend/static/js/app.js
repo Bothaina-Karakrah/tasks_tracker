@@ -75,8 +75,8 @@ function renderTasks() {
                 <span class="status-${task.status}">${formatStatus(task.status)}</span>
                 <span class="priority-${task.priority}">${formatPriority(task.priority)}</span>
                 <span>${task.category || 'General'}</span>
-                ${task.estimated_hours ? `<span>${task.estimated_hours}h estimated</span>` : ''}
-                ${task.actual_hours ? `<span>${task.actual_hours}h actual</span>` : ''}
+                ${task.estimated_days ? `<span>${task.estimated_days}h estimated</span>` : ''}
+                ${task.actual_days ? `<span>${task.actual_days}h actual</span>` : ''}
             </div>
             ${task.description ? `<p class="task-description">${task.description}</p>` : ''}
             <div class="task-dates">
@@ -143,10 +143,11 @@ async function createTask(e) {
         description: data.get('description') || null,
         priority: data.get('priority') || 'medium',
         category: data.get('category') || 'General',
-        estimated_hours: parseInt(data.get('estimated_hours')) || 1,
-        actual_hours: parseInt(data.get('actual_hours')) || 0,
+        estimated_days: parseInt(data.get('estimated_days')) || 1,
+        actual_days: parseInt(data.get('actual_days')) || 0,
         due_date: data.get('due_date') ? new Date(data.get('due_date')).toISOString() : null,
         started_at: data.get('started_at') ? new Date(data.get('started_at')).toISOString() : null,
+        completed_at: data.get('completed_at') ? new Date(data.get('completed_at')).toISOString() : null  // Added here
     };
 
     try {
@@ -174,7 +175,7 @@ function editTask(id) {
     document.getElementById('editStatus').value = task.status;
     document.getElementById('editPriority').value = task.priority;
     document.getElementById('editCategory').value = task.category || 'General';
-    document.getElementById('editActualHours').value = task.actual_hours || '';
+    document.getElementById('editActualDays').value = task.actual_days || '';
     document.getElementById('editDueDate').value = task.due_date ? formatDateTimeInput(task.due_date) : '';
     document.getElementById('editStartedAt').value = task.started_at ? formatDateTimeInput(task.started_at) : '';
     document.getElementById('editCompletedAt').value = task.completed_at ? formatDateTimeInput(task.completed_at) : '';
@@ -192,16 +193,15 @@ async function updateTask(e) {
         status: data.get('status'),
         priority: data.get('priority'),
         category: data.get('category'),
-        actual_hours: data.get('actual_hours') ? parseInt(data.get('actual_hours')) : null,
+        actual_days: data.get('actual_days') ? parseInt(data.get('actual_days')) : null,
         due_date: data.get('due_date') ? new Date(data.get('due_date')).toISOString() : null
     };
 
-    // Only include started_at if it's being set and status is in_progress
     const startedAtValue = data.get('started_at');
     if (startedAtValue) {
         payload.started_at = new Date(startedAtValue).toISOString();
     }
-    const completedAtValue = data.get('editCompletedAt');
+    const completedAtValue = data.get('completed_at');  // fixed name here
     if (completedAtValue) {
         payload.completed_at = new Date(completedAtValue).toISOString();
     }
@@ -255,7 +255,6 @@ function renderAnalytics(data) {
         </div>
         ${renderChart('Tasks by Category', data.tasks_by_category)}
         ${renderChart('Tasks by Priority', data.tasks_by_priority, true)}
-        ${renderChart('Daily Completions (7 days)', data.daily_completions, false, true)}
     `;
 }
 
