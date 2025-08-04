@@ -26,7 +26,7 @@ task-management-system/
 └── README.md              # Project documentation
 ```
 ---
-## 🚀 Features
+## Features
 -  **Create, update, delete tasks**
 -  **Track task completion with timestamps**
 -  **Filter tasks by status, priority, or category**
